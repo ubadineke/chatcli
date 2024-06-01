@@ -16,23 +16,57 @@
 // });
 
 var net = require('net');
+const readline = require('readline');
+
+let clients = [];
+
+const rl = readline.createInterface({
+    input: process.stdin,
+    output: process.stdout,
+    prompt: '>',
+});
+
+function broadcast(message, sender) {
+    clients.forEach((client) => {
+        if (client !== sender) {
+            client.write(message);
+        }
+    });
+}
+
 var server = net.createServer(function (connection) {
+    clients.push(connection);
     console.log('client connected');
+    // console.log(socket.length);
+    connection.on('data', (data) => {
+        const message = data.toString().trim();
+        console.log(`Received message: ${message}`);
+        broadcast(message, server);
+    });
 
     connection.on('end', function () {
         console.log('client disconnected');
     });
 
-    connection.write('Hello World!\r\n');
+    connection.write('Welcome from Terminal 1!\r');
     connection.pipe(connection);
 });
 
 server.on('data', (data) => {
     const message = data.toString().trim();
     console.log(`Received message: ${message}`);
-    // broadcast(message, socket);
+    broadcast(message, server);
+});
+
+rl.on('line', (input) => {
+    clients.forEach((client) => {
+        if (!client.destroyed) {
+            client.write(input);
+        }
+    });
+    rl.prompt();
 });
 
 server.listen(8080, function () {
-    console.log('server is listening');
+    console.log('Chat Room created');
 });

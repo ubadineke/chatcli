@@ -1,5 +1,8 @@
 var net = require('net');
 const readline = require('readline');
+
+let sync = false;
+
 var client = net.connect({ port: 8080 }, function () {
     console.log('connected to server!');
 });
@@ -7,11 +10,16 @@ var client = net.connect({ port: 8080 }, function () {
 const rl = readline.createInterface({
     input: process.stdin,
     output: process.stdout,
+    prompt: '>',
 });
 
 client.on('data', function (data) {
-    console.log(data.toString());
-    // client.end();
+    if (sync !== true) {
+        console.log(`Received message: ${data.toString()}`);
+    } else {
+        sync = false;
+    }
+    // process.stdout.write(data.toString() + '\n');
 });
 
 client.on('end', function () {
@@ -20,4 +28,5 @@ client.on('end', function () {
 
 rl.on('line', (input) => {
     client.write(input);
+    sync = true;
 });
