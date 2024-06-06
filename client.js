@@ -1,21 +1,26 @@
 var net = require('net');
 const readline = require('readline');
+const chalk = require('chalk');
 
 let sync = false;
 
+//get ip address of the server
+
 var client = net.connect({ port: 8080 }, function () {
-    console.log('connected to server!');
+    // const client = net.connect({ host: 'PUBLIC_IP_ADDRESS', port: 3000 }, () => {
+    console.log(chalk.green.bold('connected to server!'));
 });
 
 const rl = readline.createInterface({
     input: process.stdin,
     output: process.stdout,
-    prompt: '>',
 });
 
 client.on('data', function (data) {
+    console.log(sync);
     if (sync !== true) {
-        console.log(`Received message: ${data.toString()}`);
+        console.log('1st console:', sync);
+        console.log(chalk.yellow.bold(`Received message: ${data.toString()}`));
     } else {
         sync = false;
     }
@@ -23,7 +28,7 @@ client.on('data', function (data) {
 });
 
 client.on('end', function () {
-    console.log('disconnected from server');
+    console.log(chalk.red.bold('disconnected from server'));
 });
 
 rl.on('line', (input) => {

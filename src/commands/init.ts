@@ -4,8 +4,7 @@ const conf = new (require('conf'))();
 
 function init() {}
 
-// Store the two clients
-const net = require('node:net');
+
 const server = net.createServer((c) => {
   // 'connection' listener.
   console.log('client connected');
@@ -21,4 +20,4 @@ server.on('error', (err) => {
 server.listen(8124, () => {
   console.log('server bound');
 }); 
-});
+

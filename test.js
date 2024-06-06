@@ -16,14 +16,26 @@
 // });
 
 var net = require('net');
+const os = require('os');
 const readline = require('readline');
+const chalk = require('chalk');
 
+let interfaces = os.networkInterfaces();
+const addresses = [];
+// console.log(os.networkInterfaces());
+for (const name of Object.keys(interfaces)) {
+    for (const net of interfaces[name]) {
+        if (net.family === 'IPv4' && !net.internal) {
+            addresses.push(net.address);
+        }
+    }
+}
+console.log(addresses);
 let clients = [];
 
 const rl = readline.createInterface({
     input: process.stdin,
     output: process.stdout,
-    prompt: '>',
 });
 
 function broadcast(message, sender) {
@@ -40,12 +52,12 @@ var server = net.createServer(function (connection) {
     // console.log(socket.length);
     connection.on('data', (data) => {
         const message = data.toString().trim();
-        console.log(`Received message: ${message}`);
+        console.log(chalk.blue.bold(`Received message: ${message}`));
         broadcast(message, server);
     });
 
     connection.on('end', function () {
-        console.log('client disconnected');
+        console.log(chalk.red.bold('client disconnected'));
     });
 
     connection.write('Welcome from Terminal 1!\r');
@@ -54,7 +66,7 @@ var server = net.createServer(function (connection) {
 
 server.on('data', (data) => {
     const message = data.toString().trim();
-    console.log(`Received message: ${message}`);
+    console.log(chalk.magenta.bold(`Received message: ${message}`));
     broadcast(message, server);
 });
 
@@ -64,9 +76,8 @@ rl.on('line', (input) => {
             client.write(input);
         }
     });
-    rl.prompt();
 });
 
 server.listen(8080, function () {
-    console.log('Chat Room created');
+    console.log(chalk.green.bold('Chat Room created'));
 });
