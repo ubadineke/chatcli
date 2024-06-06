@@ -60,7 +60,7 @@ var server = net.createServer(function (connection) {
         console.log(chalk.red.bold('client disconnected'));
     });
 
-    connection.write('Welcome from Terminal 1!\r');
+    connection.write('Welcome from Terminal 1!');
     connection.pipe(connection);
 });
 
